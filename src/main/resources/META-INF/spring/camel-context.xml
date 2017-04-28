@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+    http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+ 	
+ 	<context:component-scan base-package="com.insoft"></context:component-scan>
+ 	
+ 	<!--**********************************DATASOURCE****************************************-->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/springbd"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="admin1"></property>
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!--*************************************************************************************-->
+	<!--**********************************PROPIEDADES****************************************-->
+ 	<bean id="propierties" class="com.insoft.propierties.propierties">
+		<property name="id_propiedad" value="100" />
+		<property name="descripcion" value="esta es una propiedad" />
+	</bean>
+	<!--*************************************************************************************-->
+	<!--***********************************BEANS*********************************************-->
+	<bean id="propierties-bean" class="com.insoft.integracion.PropiertiesBean" />
+	<bean id="datasource-bean" class="com.insoft.integracion.DataSourceBean" />
+
+	<!--*************************************************************************************-->
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		<route>
+			<from uri="timer:foo?period=5000" />
+			<process ref="datasource-bean"></process>
+			<log message="The message contains ${body}" />
+		</route>
+	</camelContext>
+	
+</beans>
